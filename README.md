@@ -8,8 +8,20 @@ A passive, furniture-grade day dashboard for a wall tablet, built as a Home Assi
 
 Any screen can show an **alert band** (severe-weather warning, poor air quality, water leak) with a one-time chime when it appears. Nothing on screen is tappable; there is no interaction at all.
 
-![Morning screen](design-ref/mock-2a.png)
-![Evening screen](design-ref/mock-2c.png)
+<img src="photos/sideboard-fire-hd10.jpg" alt="Sideboard running on a Fire HD 10 in a kitchen corner" width="100%">
+
+*Live on a Fire HD 10 in Fully Kiosk Browser.*
+
+### The three screens
+
+<p>
+  <img src="design-ref/mock-2a.png" alt="Morning screen" width="49%">
+  <img src="design-ref/mock-2c.png" alt="Evening screen" width="49%">
+</p>
+<p>
+  <img src="design-ref/mock-2b.png" alt="Morning screen with air-quality alert band" width="49%">
+  <img src="design-ref/mock-2d.png" alt="Night screen" width="49%">
+</p>
 
 ## Requirements
 
