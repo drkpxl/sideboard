@@ -15,14 +15,34 @@ const FORCE_ALERT = params.get('alert') === 'demo';
 
 // ------------------------------------------------------------ scale to fit
 
+function viewportSize() {
+  // Kiosk WebViews (Fully on Fire tablets especially) can disagree between
+  // layout viewport, visual viewport, and window size. Trust the smallest
+  // credible answer so the stage always fits what is actually visible.
+  const candidates = [
+    [document.documentElement.clientWidth, document.documentElement.clientHeight],
+    [window.visualViewport?.width, window.visualViewport?.height],
+    [innerWidth, innerHeight],
+  ];
+  let w = Infinity, h = Infinity;
+  for (const [cw, ch] of candidates) {
+    if (cw > 0) w = Math.min(w, cw);
+    if (ch > 0) h = Math.min(h, ch);
+  }
+  return Number.isFinite(w) && Number.isFinite(h) ? { w, h } : { w: 1920, h: 1200 };
+}
+
 function fitStage() {
-  const s = Math.min(innerWidth / 1920, innerHeight / 1200);
+  const { w, h } = viewportSize();
+  const s = Math.min(w / 1920, h / 1200);
   const stage = document.getElementById('stage');
   stage.style.transform =
     `translate(-50%, -50%) scale(${s}) translate(${burnShift.x}px, ${burnShift.y}px)`;
 }
 let burnShift = { x: 0, y: 0 };
 addEventListener('resize', fitStage);
+addEventListener('orientationchange', fitStage);
+window.visualViewport?.addEventListener('resize', fitStage);
 
 function updateBurnShift() {
   const h = new Date().getHours();
@@ -336,7 +356,9 @@ const RENDERERS = { morning: renderMorning, evening: renderEvening, night: rende
 // ------------------------------------------------------------- main loop
 
 function render() {
+  fitStage(); // some kiosk WebViews never fire resize — refit each tick
   const target = daypart();
+  document.body.style.background = target === 'night' ? '#191512' : '#FAF7F0';
   const renderer = RENDERERS[target] || renderNight;
   if (target !== currentScreen) {
     // Crossfade: draw into the idle layer, then swap.

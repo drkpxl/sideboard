@@ -42,7 +42,7 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; background: #000; overflow: hidden; }
+html, body { height: 100%; background: var(--ground); overflow: hidden; }
 body { font-family: 'Work Sans', sans-serif; }
 
 #stage {
