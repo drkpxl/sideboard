@@ -86,10 +86,15 @@ function loadEnv() {
   return out;
 }
 const ENV = loadEnv();
-const SUPERVISOR_TOKEN = process.env.SUPERVISOR_TOKEN || null;
+// The Supervisor token env var has been renamed across generations
+// (HASSIO_TOKEN → SUPERVISOR_TOKEN → the "apps" era); accept any of them.
+const SUPERVISOR_TOKEN = process.env.SUPERVISOR_TOKEN || process.env.HASSIO_TOKEN
+  || process.env.APP_TOKEN || null;
 const TOKEN = SUPERVISOR_TOKEN || process.env.HA_LL_ACCESS_TOKEN || ENV.HA_LL_ACCESS_TOKEN;
 if (!TOKEN) {
-  console.error('No auth available: need SUPERVISOR_TOKEN (add-on) or HA_LL_ACCESS_TOKEN in .env (dev)');
+  console.error('No auth available: need a Supervisor token (add-on) or HA_LL_ACCESS_TOKEN in .env (dev)');
+  // Env var NAMES only (no values) — tells us what this Supervisor provides.
+  console.error('Environment variables present:', Object.keys(process.env).sort().join(', '));
   process.exit(1);
 }
 const API_BASE = SUPERVISOR_TOKEN
