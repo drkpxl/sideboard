@@ -1,0 +1,39 @@
+{
+  "port": 8090,
+  "haUrl": "http://homeassistant:8123",
+  "entities": {
+    "weather": "weather.swadley_weather",
+    "outdoorWeather": "weather.lakewoodnws_kbjc",
+    "sun": "sun.sun",
+    "indoorTemp": "sensor.kitchen_temperature",
+    "outdoorAqi": "sensor.airnow_aqi",
+    "indoorAqi": "sensor.kitchen_aqi",
+    "energyToday": "sensor.energy_today",
+    "waterToday": "sensor.water_today",
+    "gasTotal": "sensor.gas_consumption",
+    "familyCalendar": "calendar.steve_stacey",
+    "binsSource": "calendar.reminders",
+    "nwsAlertEntity": "sensor.nws_alerts_lakewood_nws_alerts_alerts",
+    "leakSensors": [
+      "binary_sensor.smart_water_leak_sensor_150010200809_waterleak",
+      "binary_sensor.water_meter_10550481_leak_sensor_2"
+    ]
+  },
+  "dayparts": {
+    "morningStart": "05:30",
+    "morningEnd": "09:30",
+    "eveningStart": "16:30",
+    "eveningEnd": "22:30",
+    "dayShows": "evening"
+  },
+  "prepBufferMin": 15,
+  "aqiAlertThreshold": 125,
+  "rainProbThreshold": 40,
+  "gasThermsPerFt3": 0.01037,
+  "language": null,
+  "timeFormat": "auto",
+  "nws": {
+    "enabled": true,
+    "userAgent": "ha-passive-dashboard/1.0 (steven@drkpxl.com)"
+  }
+}

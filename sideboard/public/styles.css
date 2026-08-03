@@ -1,0 +1,435 @@
+/* Day Board — device-scale (1920×1200) stylesheet.
+   All px values are the mock's 880×550 values × 2.1818 per the handoff. */
+
+@font-face {
+  font-family: 'Jost';
+  src: url('/fonts/jost-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Work Sans';
+  src: url('/fonts/worksans-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --ground: #FAF7F0;
+  --card: #FFFDF8;
+  --walnut: #543824;
+  --walnut-text: #EFE4D4;
+  --walnut-text-dim: #E2D5C2;
+  --ink: #2B2723;
+  --ink-mid: #6B5E4D;
+  --label: #8A7A66;
+  --caption: #9A8B76;
+  --teak: #B87F4A;
+  --teak-light: #C79A6B;
+  --olive: #40624F;
+  --olive-label: #A8C0AE;
+  --sage: #8FA9A0;
+  --alert: #C0561F;
+  --alert-text: #FBF3E9;
+  --night-bg: #191512;
+  --night-clock: #C3B49E;
+  --night-label: #6E6252;
+  --night-tertiary: #4E463C;
+  --night-warm: #B0703C;
+  --grain: repeating-linear-gradient(92deg, #543824 0 7px, #5E4029 7px 13px, #4E3421 13px 20px);
+  --radius: 7px;
+  --shadow: 0 2px 0 rgba(43, 39, 35, .10);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; background: #000; overflow: hidden; }
+body { font-family: 'Work Sans', sans-serif; }
+
+#stage {
+  position: absolute;
+  width: 1920px;
+  height: 1200px;
+  left: 50%;
+  top: 50%;
+  transform-origin: center center;
+  /* scale set from JS */
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--ground);
+  transition: opacity .5s ease;
+  opacity: 1;
+}
+.screen.hidden { opacity: 0; pointer-events: none; }
+
+.num { font-family: 'Jost', sans-serif; }
+
+/* ------------------------------------------------ rails */
+
+.rail {
+  flex: none;
+  background: var(--grain);
+  color: var(--walnut-text);
+  padding: 28px 65px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+.rail .right { opacity: .72; }
+
+/* ------------------------------------------------ alert band */
+
+.alert-band {
+  flex: none;
+  background: var(--alert);
+  color: var(--alert-text);
+  padding: 28px 65px;
+  font-family: 'Jost', sans-serif;
+  font-size: 61px;
+  font-weight: 400;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ------------------------------------------------ morning */
+
+.m-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 30px 57px;
+  padding: 52px 65px;
+  min-height: 0;
+}
+.m-body > * { min-width: 0; min-height: 0; }
+.screen.compact .m-body { padding: 39px 65px; }
+
+.sec-label {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+
+.m-countdown .clock {
+  font-family: 'Jost', sans-serif;
+  font-size: 270px;
+  font-weight: 400;
+  line-height: .84;
+  letter-spacing: -.03em;
+  color: var(--ink);
+  margin-top: 22px;
+}
+.screen.compact .m-countdown .clock { font-size: 218px; }
+.m-countdown .sub {
+  display: flex;
+  align-items: baseline;
+  gap: 26px;
+  margin-top: 26px;
+  min-width: 0;
+}
+.m-countdown .who {
+  min-width: 0;
+  font-family: 'Jost', sans-serif;
+  font-size: 63px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.m-countdown .in {
+  font-family: 'Jost', sans-serif;
+  font-size: 46px;
+  font-weight: 300;
+  color: var(--label);
+  white-space: nowrap;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.m-agenda { padding: 39px 44px; min-height: 0; overflow: hidden; }
+.m-agenda .rows { margin-top: 30px; display: flex; flex-direction: column; gap: 22px; }
+.agenda-row { display: flex; align-items: baseline; gap: 22px; }
+.agenda-row .t {
+  font-family: 'Jost', sans-serif;
+  font-size: 46px;
+  font-weight: 500;
+  color: var(--teak);
+  flex: none;
+  width: 135px;
+}
+.screen.compact .agenda-row .t { font-size: 46px; }
+.agenda-row .n {
+  font-family: 'Jost', sans-serif;
+  font-size: 48px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agenda-row .t.allday { font-family: 'Work Sans'; font-size: 24px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--caption); align-self: center; }
+
+.m-advice {
+  background: var(--olive);
+  border-radius: var(--radius);
+  padding: 39px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 26px;
+  min-height: 0;
+}
+.m-advice .sec-label { color: var(--olive-label); }
+.m-advice .text {
+  font-family: 'Jost', sans-serif;
+  font-size: 57px;
+  line-height: 1.28;
+  color: #FAF7F0;
+  white-space: pre-line;
+}
+.screen.compact .m-advice .text { font-size: 52px; }
+
+.m-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 24px;
+  min-height: 0;
+}
+.tile {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 31px 35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 13px;
+  min-height: 0;
+  overflow: hidden;
+}
+.tile .cap {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--caption);
+}
+.tile .pair { display: flex; gap: 48px; }
+.tile .stack { display: flex; flex-direction: column; gap: 9px; }
+.tile .v {
+  font-family: 'Jost', sans-serif;
+  font-size: 65px;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.screen.compact .tile .v { font-size: 59px; }
+.tile .v.dim { color: var(--label); }
+
+.tile.alerting { background: var(--alert); }
+.tile.alerting .v, .tile.alerting .v.dim { color: var(--alert-text); }
+.tile.alerting .cap { color: var(--alert-text); opacity: .8; }
+
+.tile.power .head { display: flex; justify-content: space-between; align-items: baseline; }
+.tile.power .total {
+  font-family: 'Jost', sans-serif;
+  font-size: 48px;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.tile.power .total small { font-size: 28px; color: var(--label); font-weight: 400; margin-left: 6px; }
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 65px;
+}
+.bars .b {
+  flex: 1;
+  background: var(--teak-light);
+  border-radius: 2px 2px 0 0;
+  min-height: 4px;
+}
+.bars .b.now { background: var(--walnut); }
+.bars.water .b { background: var(--sage); }
+.bars.water .b.now { background: var(--walnut); }
+.axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--caption);
+}
+
+.m-footer {
+  flex: none;
+  padding: 0 65px 35px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 30px;
+  color: var(--ink-mid);
+}
+.m-footer .dot {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--teak);
+  flex: none;
+}
+.m-footer.empty { visibility: hidden; }
+
+/* ------------------------------------------------ evening */
+
+.e-body {
+  flex: 1;
+  display: flex;
+  padding: 57px 65px;
+  gap: 57px;
+  min-height: 0;
+}
+.e-left {
+  flex: 1.4;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.e-left .rows { margin-top: 44px; display: flex; flex-direction: column; gap: 30px; }
+.e-left .agenda-row .t { font-size: 61px; width: 175px; }
+.e-left .agenda-row .n { font-size: 65px; }
+.e-prep {
+  margin-top: auto;
+  background: var(--olive);
+  border-radius: var(--radius);
+  padding: 33px 39px;
+  font-family: 'Jost', sans-serif;
+  font-size: 57px;
+  line-height: 1.28;
+  color: #FAF7F0;
+  white-space: pre-line;
+}
+.e-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  min-width: 0;
+}
+.e-card { padding: 35px 44px; display: flex; flex-direction: column; gap: 17px; }
+.e-card .big {
+  font-family: 'Jost', sans-serif;
+  font-size: 79px;
+  line-height: 1.05;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.e-card .sub { font-size: 30px; color: var(--ink-mid); }
+.e-card.alerting { background: var(--alert); }
+.e-card.alerting .big, .e-card.alerting .sub { color: var(--alert-text); }
+.e-card.alerting .sec-label { color: var(--alert-text); opacity: .8; }
+
+.e-usage { flex: 1; padding: 35px 44px; display: flex; flex-direction: column; justify-content: center; gap: 30px; min-height: 0; }
+.e-usage .chart { display: flex; flex-direction: column; gap: 15px; }
+.e-usage .head { display: flex; justify-content: space-between; align-items: baseline; }
+.e-usage .total {
+  font-family: 'Jost', sans-serif;
+  font-size: 48px;
+  line-height: 1;
+  color: var(--ink);
+}
+.e-usage .total small { font-size: 28px; color: var(--label); font-weight: 400; margin-left: 6px; }
+.e-usage .bars { height: 57px; }
+
+.e-footer {
+  flex: none;
+  background: var(--walnut);
+  color: var(--walnut-text-dim);
+  padding: 24px 65px;
+  display: flex;
+  align-items: baseline;
+  gap: 96px;
+}
+.e-footer .lbl {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  opacity: .6;
+}
+.e-footer .val { font-family: 'Jost', sans-serif; font-size: 30px; }
+
+/* ------------------------------------------------ night */
+
+.screen.night { background: var(--night-bg); }
+.n-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 35px;
+  position: relative;
+}
+.n-clock {
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 270px;
+  line-height: .84;
+  letter-spacing: -.03em;
+  color: var(--night-clock);
+}
+.n-temps {
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--night-label);
+}
+.n-cond {
+  font-family: 'Jost', sans-serif;
+  font-size: 57px;
+  color: var(--night-warm);
+}
+.n-first {
+  position: absolute;
+  bottom: 52px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--night-tertiary);
+}
+.screen.night .alert-band { font-size: 52px; }
+
+/* offline hint — tiny, unobtrusive */
+.stale {
+  position: absolute;
+  bottom: 10px;
+  right: 16px;
+  font-size: 18px;
+  color: var(--caption);
+  opacity: .7;
+}

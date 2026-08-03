@@ -1,0 +1,71 @@
+name: Sideboard
+version: "1.0.0"
+slug: sideboard
+description: A passive, furniture-grade day dashboard for a wall tablet — morning, evening, and night screens
+url: https://github.com/drkpxl/sideboard
+arch:
+  - amd64
+  - aarch64
+  - armv7
+init: false
+homeassistant_api: true
+ports:
+  8090/tcp: 8090
+ports_description:
+  8090/tcp: Dashboard web UI (point your kiosk browser here)
+webui: http://[HOST]:[PORT:8090]
+options:
+  weather_entity: weather.swadley_weather
+  outdoor_weather_entity: weather.lakewoodnws_kbjc
+  indoor_temp_entity: sensor.kitchen_temperature
+  outdoor_aqi_entity: sensor.airnow_aqi
+  indoor_aqi_entity: sensor.kitchen_aqi
+  energy_today_entity: sensor.energy_today
+  water_today_entity: sensor.water_today
+  gas_total_entity: sensor.gas_consumption
+  family_calendar: calendar.steve_stacey
+  bins_source: calendar.reminders
+  nws_alert_entity: sensor.nws_alerts_lakewood_nws_alerts_alerts
+  leak_sensors:
+    - binary_sensor.smart_water_leak_sensor_150010200809_waterleak
+    - binary_sensor.water_meter_10550481_leak_sensor_2
+  morning_start: "05:30"
+  morning_end: "09:30"
+  evening_start: "16:30"
+  evening_end: "22:30"
+  day_shows: evening
+  prep_buffer_min: 15
+  aqi_alert_threshold: 125
+  rain_prob_threshold: 40
+  gas_therms_per_ft3: 0.01037
+  language: ""
+  time_format: auto
+  nws_alerts: true
+  nws_user_agent: day-board-addon (set-your-contact@email.here)
+schema:
+  weather_entity: str
+  outdoor_weather_entity: str?
+  indoor_temp_entity: str?
+  outdoor_aqi_entity: str?
+  indoor_aqi_entity: str?
+  energy_today_entity: str?
+  water_today_entity: str?
+  gas_total_entity: str?
+  family_calendar: str
+  bins_source: str?
+  nws_alert_entity: str?
+  leak_sensors:
+    - str
+  morning_start: match(^\d{2}:\d{2}$)
+  morning_end: match(^\d{2}:\d{2}$)
+  evening_start: match(^\d{2}:\d{2}$)
+  evening_end: match(^\d{2}:\d{2}$)
+  day_shows: list(morning|evening|night)
+  prep_buffer_min: int(0,180)
+  aqi_alert_threshold: int(0,500)
+  rain_prob_threshold: int(0,100)
+  gas_therms_per_ft3: float
+  language: str?
+  time_format: list(auto|12|24)
+  nws_alerts: bool
+  nws_user_agent: str
