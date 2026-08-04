@@ -15,12 +15,12 @@ Any screen can show an **alert band** (severe-weather warning, poor air quality,
 ### The three screens
 
 <p>
-  <img src="design-ref/mock-2a.png" alt="Morning screen" width="49%">
-  <img src="design-ref/mock-2c.png" alt="Evening screen" width="49%">
+  <img src="photos/screen-morning.png" alt="Morning screen" width="49%">
+  <img src="photos/screen-evening.png" alt="Evening screen" width="49%">
 </p>
 <p>
-  <img src="design-ref/mock-2b.png" alt="Morning screen with air-quality alert band" width="49%">
-  <img src="design-ref/mock-2d.png" alt="Night screen" width="49%">
+  <img src="photos/screen-morning-alert.png" alt="Morning screen with air-quality alert band" width="49%">
+  <img src="photos/screen-night.png" alt="Night screen" width="49%">
 </p>
 
 ## Requirements
@@ -97,6 +97,3 @@ node sideboard/server.js  # Node 22+, zero dependencies
 
 `.env` needs `HA_LL_ACCESS_TOKEN=<token>` and optionally `HA_URL=http://homeassistant:8123`. Dev configuration lives in `local.config.json` (same shape the add-on options produce). Force screens while testing with `?screen=morning|evening|night` and `?alert=demo`.
 
-## Design
-
-The visual design (warm plaster, walnut rails, Jost/Work Sans, the olive advice block) is documented in [`design-ref/design-handoff.md`](design-ref/design-handoff.md) with the original mock-ups alongside it.
