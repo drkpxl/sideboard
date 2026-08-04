@@ -1,5 +1,5 @@
 name: Sideboard
-version: "1.0.3"
+version: "1.1.0"
 slug: sideboard
 description: A passive, furniture-grade day dashboard for a wall tablet — morning, evening, and night screens
 url: https://github.com/drkpxl/sideboard
@@ -29,6 +29,14 @@ options:
   leak_sensors:
     - binary_sensor.smart_water_leak_sensor_150010200809_waterleak
     - binary_sensor.water_meter_10550481_leak_sensor_2
+  co_sensors: []
+  radon_sensor: ""
+  door_sensors: []
+  garage_doors: []
+  birdnet_sensor: ""
+  commute_sensor: ""
+  workday_sensor: ""
+  commute_presence: ""
   morning_start: "05:30"
   morning_end: "09:30"
   evening_start: "16:30"
@@ -36,6 +44,10 @@ options:
   day_shows: evening
   prep_buffer_min: 15
   aqi_alert_threshold: 125
+  co_alert_ppm: 9
+  radon_alert_pci_l: 4
+  max_alerts: 3
+  bird_max_age_hours: 12
   rain_prob_threshold: 40
   gas_therms_per_ft3: 0.01037
   language: ""
@@ -56,6 +68,17 @@ schema:
   nws_alert_entity: str?
   leak_sensors:
     - str
+  co_sensors:
+    - str
+  radon_sensor: str?
+  door_sensors:
+    - str
+  garage_doors:
+    - str
+  birdnet_sensor: str?
+  commute_sensor: str?
+  workday_sensor: str?
+  commute_presence: str?
   morning_start: match(^\d{2}:\d{2}$)
   morning_end: match(^\d{2}:\d{2}$)
   evening_start: match(^\d{2}:\d{2}$)
@@ -63,6 +86,10 @@ schema:
   day_shows: list(morning|evening|night)
   prep_buffer_min: int(0,180)
   aqi_alert_threshold: int(0,500)
+  co_alert_ppm: int(0,1000)
+  radon_alert_pci_l: float
+  max_alerts: int(1,6)
+  bird_max_age_hours: int(1,72)
   rain_prob_threshold: int(0,100)
   gas_therms_per_ft3: float
   language: str?

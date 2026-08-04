@@ -32,6 +32,14 @@ function optionsToConfig(o) {
       binsSource: s(o.bins_source),
       nwsAlertEntity: s(o.nws_alert_entity),
       leakSensors: (o.leak_sensors || []).map(s).filter(Boolean),
+      coSensors: (o.co_sensors || []).map(s).filter(Boolean),
+      radonSensor: s(o.radon_sensor),
+      doorSensors: (o.door_sensors || []).map(s).filter(Boolean),
+      garageDoors: (o.garage_doors || []).map(s).filter(Boolean),
+      birdnetSensor: s(o.birdnet_sensor),
+      commuteSensor: s(o.commute_sensor),
+      workdaySensor: s(o.workday_sensor),
+      commutePresence: s(o.commute_presence),
     },
     dayparts: {
       morningStart: o.morning_start ?? '05:30',
@@ -42,6 +50,10 @@ function optionsToConfig(o) {
     },
     prepBufferMin: o.prep_buffer_min ?? 15,
     aqiAlertThreshold: o.aqi_alert_threshold ?? 125,
+    coAlertPpm: o.co_alert_ppm ?? 9,
+    radonAlertPciL: o.radon_alert_pci_l ?? 4,
+    maxAlerts: o.max_alerts ?? 3,
+    birdMaxAgeHours: o.bird_max_age_hours ?? 12,
     rainProbThreshold: o.rain_prob_threshold ?? 40,
     gasThermsPerFt3: o.gas_therms_per_ft3 ?? 0.01037,
     language: s(o.language),
@@ -71,7 +83,25 @@ function loadConfig() {
   }
   return JSON.parse(fs.readFileSync(p, 'utf8'));
 }
-const CONFIG = loadConfig();
+
+// Every optional feature must be safe to omit entirely: a config written for an
+// older version, or by someone who owns none of these sensors, has to boot.
+function normalizeConfig(c) {
+  c.entities ||= {};
+  for (const k of ['leakSensors', 'coSensors', 'doorSensors', 'garageDoors']) {
+    c.entities[k] = Array.isArray(c.entities[k]) ? c.entities[k].filter(Boolean) : [];
+  }
+  for (const k of ['radonSensor', 'birdnetSensor', 'commuteSensor',
+    'workdaySensor', 'commutePresence']) {
+    c.entities[k] ??= null;
+  }
+  c.coAlertPpm ??= 9;
+  c.radonAlertPciL ??= 4;
+  c.maxAlerts ??= 3;
+  c.birdMaxAgeHours ??= 12;
+  return c;
+}
+const CONFIG = normalizeConfig(loadConfig());
 
 function loadEnv() {
   const out = {};
@@ -128,6 +158,7 @@ const LANG = {
     nextOut: 'NEXT OUT THE DOOR', firstUpTomorrow: 'FIRST UP TOMORROW', today: 'TODAY',
     thenToday: 'THEN TODAY', takeWithYou: 'TAKE WITH YOU', tomorrow: 'TOMORROW',
     overnight: 'OVERNIGHT', powerToday: 'POWER TODAY', waterToday: 'WATER TODAY',
+    gasToday: 'GAS TODAY',
     rainToday: 'RAIN TODAY', temperature: 'TEMPERATURE', airQuality: 'AIR QUALITY',
     outside: 'outside', inside: 'inside', sunrise: 'SUNRISE', sunset: 'SUNSET',
     railIn: 'IN', railOut: 'OUT', allDay: 'ALL DAY', firstUp: 'FIRST UP', now: 'NOW',
@@ -157,9 +188,6 @@ const LANG = {
     umbrellaLikely: () => 'Umbrella too — rain likely.',
     binsTonight: kinds => `Bins out tonight — ${kinds}`,
     binsGoOut: () => 'Bins go out tonight.',
-    earlyStart: (name, time) => `Early start — ${name} at ${time}.`,
-    firstUpTmrw: (name, time) => `First up tomorrow — ${name} at ${time}.`,
-    nothingTomorrow: () => 'Nothing on the calendar tomorrow morning.',
     rainTomorrow: () => 'Rain tomorrow — umbrellas by the door.',
     overnightLow: (cond, low) => `${cond}, low ${low}°`,
     windowsOpen: 'windows can stay open', windowsClose: 'close the windows',
@@ -173,12 +201,22 @@ const LANG = {
     aqiAlert: (label, aqi) => `Air quality ${label} — AQI ${aqi}`,
     aqiPoor: 'poor', aqiUnhealthy: 'unhealthy', aqiVeryUnhealthy: 'very unhealthy',
     alertUntil: (text, time) => `${text} until ${time}`,
+    coAlert: (name, ppm) => `Carbon monoxide — ${name} ${ppm} ppm`,
+    radonAlert: v => `Radon elevated — ${v} pCi/L`,
+    // client labels
+    moreAlertsTpl: '+{n} more', latestBird: 'LATEST BIRD', beforeBed: 'BEFORE BED',
+    // closure + commute sentences
+    allClosed: () => 'All doors closed',
+    openList: names => `${names} still open`,
+    stillOpen: names => `Still open — ${names}.`,
+    commuteTo: (min, name) => `${min} min to ${name}`,
   },
   es: {
     locale: 'es-MX',
     nextOut: 'PRÓXIMA SALIDA', firstUpTomorrow: 'PRIMERO MAÑANA', today: 'HOY',
     thenToday: 'LUEGO HOY', takeWithYou: 'LLEVA CONTIGO', tomorrow: 'MAÑANA',
     overnight: 'ESTA NOCHE', powerToday: 'ENERGÍA HOY', waterToday: 'AGUA HOY',
+    gasToday: 'GAS HOY',
     rainToday: 'LLUVIA HOY', temperature: 'TEMPERATURA', airQuality: 'CALIDAD DEL AIRE',
     outside: 'afuera', inside: 'adentro', sunrise: 'AMANECER', sunset: 'ATARDECER',
     railIn: 'INT', railOut: 'EXT', allDay: 'TODO EL DÍA', firstUp: 'PRIMERO', now: 'AHORA',
@@ -207,9 +245,6 @@ const LANG = {
     umbrellaLikely: () => 'Paraguas también — probable lluvia.',
     binsTonight: kinds => `Sacar esta noche — ${kinds}`,
     binsGoOut: () => 'La basura sale esta noche.',
-    earlyStart: (name, time) => `Inicio temprano — ${name} a las ${time}.`,
-    firstUpTmrw: (name, time) => `Primero mañana — ${name} a las ${time}.`,
-    nothingTomorrow: () => 'Nada en el calendario mañana temprano.',
     rainTomorrow: () => 'Lluvia mañana — paraguas junto a la puerta.',
     overnightLow: (cond, low) => `${cond}, mínima ${low}°`,
     windowsOpen: 'las ventanas pueden quedar abiertas', windowsClose: 'cierra las ventanas',
@@ -223,6 +258,13 @@ const LANG = {
     aqiAlert: (label, aqi) => `Calidad del aire ${label} — AQI ${aqi}`,
     aqiPoor: 'mala', aqiUnhealthy: 'dañina', aqiVeryUnhealthy: 'muy dañina',
     alertUntil: (text, time) => `${text} hasta ${time}`,
+    coAlert: (name, ppm) => `Monóxido de carbono — ${name} ${ppm} ppm`,
+    radonAlert: v => `Radón elevado — ${v} pCi/L`,
+    moreAlertsTpl: '+{n} más', latestBird: 'ÚLTIMA AVE', beforeBed: 'ANTES DE DORMIR',
+    allClosed: () => 'Todas las puertas cerradas',
+    openList: names => `${names} sin cerrar`,
+    stillOpen: names => `Sigue abierto — ${names}.`,
+    commuteTo: (min, name) => `${min} min a ${name}`,
   },
 };
 // Language, locale, clock style, and units all come from HA's own config at
@@ -337,6 +379,12 @@ const TRACKED = [
   CONFIG.entities.energyToday, CONFIG.entities.waterToday, CONFIG.entities.gasTotal,
   CONFIG.entities.nwsAlertEntity,
   ...CONFIG.entities.leakSensors,
+  ...CONFIG.entities.coSensors,
+  ...CONFIG.entities.doorSensors,
+  ...CONFIG.entities.garageDoors,
+  CONFIG.entities.radonSensor, CONFIG.entities.birdnetSensor,
+  CONFIG.entities.commuteSensor, CONFIG.entities.workdaySensor,
+  CONFIG.entities.commutePresence,
 ].filter(Boolean);
 
 // ------------------------------------------------------------------ pollers
@@ -533,6 +581,29 @@ async function pollNws() {
 function ent(id) { return S.entities[id] || null; }
 function entNum(id) { return numeric(ent(id)?.state); }
 
+// Integrations love to stutter ("Side Door Door", "Garage Door Opener Garage").
+// Drop any word that already appeared so display names read like a person wrote
+// them, without asking anyone to rename entities in HA.
+function cleanName(raw) {
+  const seen = new Set();
+  const words = String(raw || '').split(/\s+/).filter(w => {
+    const k = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!k) return true;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  return words.join(' ') || String(raw || '');
+}
+
+function listJoin(items) {
+  try {
+    return new Intl.ListFormat(LOCALE, { style: 'long', type: 'conjunction' }).format(items);
+  } catch {
+    return items.join(', ');
+  }
+}
+
 // Current outdoor conditions: prefer the real NWS station observation,
 // fall back to the forecast integration's modeled "now".
 function outdoorNow() {
@@ -716,21 +787,20 @@ function tomorrowCard() {
   };
 }
 
+// Things to do before bed — and only those. Tomorrow's agenda is printed
+// directly above this box, so a line that merely restates the first event
+// there earns nothing; it is left out even when the box ends up empty.
 function eveningPrep() {
   const lines = [];
-  const first = timedEvents(S.calTomorrow)[0];
-  if (first) {
-    const { h } = zonedParts(first.start);
-    if (h < 9) lines.push(L.earlyStart(first.summary, fmtClock(first.start)));
-  }
+  // An open door at bedtime outranks everything else here.
+  const shut = closure();
+  if (shut?.open) lines.push(L.stillOpen(shut.names));
   if (binsLine()) lines.push(L.binsGoOut());
   const tom = tomorrowDaily();
   if ((numeric(tom?.precipitation_probability) ?? 0) >= CONFIG.rainProbThreshold) {
     lines.push(L.rainTomorrow());
   }
-  if (!lines.length && first) lines.push(L.firstUpTmrw(first.summary, fmtClock(first.start)));
-  if (!lines.length) lines.push(L.nothingTomorrow());
-  return lines.slice(0, 2).join('\n');
+  return lines.length ? lines.slice(0, 2).join('\n') : null;
 }
 
 function nightCondition() {
@@ -775,17 +845,41 @@ function activeNwsAlerts() {
     .map(a => ({ event: a.Event, headline: a.Headline, ends: a.Ends || a.Expires, severity: a.Severity }));
 }
 
-function alertBand() {
-  // Priority: leak > NWS warning > AQI.
-  for (const id of CONFIG.entities.leakSensors) {
-    if (ent(id)?.state === 'on') {
-      const name = ent(id).attributes?.friendly_name || id;
-      return { text: L.waterLeak(name), tile: null, id: `leak:${id}` };
-    }
+// Radon meters report either pCi/L (US) or Bq/m³; thresholds are authored in
+// pCi/L against the EPA action level, so normalize on the way in.
+function radonPciL() {
+  const e = ent(CONFIG.entities.radonSensor);
+  const v = numeric(e?.state);
+  if (v === null) return null;
+  const unit = String(e.attributes?.unit_of_measurement || '').toLowerCase();
+  return unit.includes('bq') ? v / 37 : v;
+}
+
+// Every alert currently active, most severe first. The band stacks them, so
+// this returns all of them rather than winning a priority contest.
+function alerts() {
+  const out = [];
+
+  // Life safety first.
+  for (const id of CONFIG.entities.coSensors) {
+    const e = ent(id);
+    const ppm = numeric(e?.state);
+    if (ppm === null || ppm < CONFIG.coAlertPpm) continue;
+    const name = cleanName(e.attributes?.friendly_name || id);
+    out.push({
+      text: L.coAlert(name, Math.round(ppm)), tile: null,
+      // Bucket the id so a drifting reading re-chimes on real escalation only.
+      id: `co:${id}:${Math.round(ppm / 10)}`,
+    });
   }
-  const nwsAlerts = activeNwsAlerts();
-  if (nwsAlerts.length) {
-    const a = nwsAlerts[0];
+
+  for (const id of CONFIG.entities.leakSensors) {
+    if (ent(id)?.state !== 'on') continue;
+    const name = cleanName(ent(id).attributes?.friendly_name || id);
+    out.push({ text: L.waterLeak(name), tile: null, id: `leak:${id}` });
+  }
+
+  for (const a of activeNwsAlerts()) {
     let text = a.event;
     if (a.ends) {
       const end = new Date(a.ends);
@@ -793,14 +887,92 @@ function alertBand() {
       text = L.alertUntil(text, fmtClock(end) + mer);
     }
     const tile = /freeze|frost|cold|winter|heat/i.test(a.event) ? 'temperature' : null;
-    return { text, tile, id: `nws:${a.event}:${a.ends || ''}` };
+    out.push({ text, tile, id: `nws:${a.event}:${a.ends || ''}` });
   }
+
+  const radon = radonPciL();
+  if (radon !== null && radon >= CONFIG.radonAlertPciL) {
+    out.push({
+      text: L.radonAlert(radon.toFixed(1)), tile: null,
+      id: `radon:${Math.round(radon)}`,
+    });
+  }
+
   const aqi = entNum(CONFIG.entities.outdoorAqi);
   if (aqi !== null && aqi >= CONFIG.aqiAlertThreshold) {
     const label = aqi >= 200 ? L.aqiVeryUnhealthy : aqi >= 150 ? L.aqiUnhealthy : L.aqiPoor;
-    return { text: L.aqiAlert(label, Math.round(aqi)), tile: 'aqi', id: `aqi:${Math.round(aqi / 25)}` };
+    out.push({ text: L.aqiAlert(label, Math.round(aqi)), tile: 'aqi', id: `aqi:${Math.round(aqi / 25)}` });
   }
-  return null;
+
+  return out;
+}
+
+// Doors and garage covers as one list. A cover mid-travel counts as open;
+// unavailable counts as closed, because a dead radio is not evidence of a
+// door standing open and a false alarm at bedtime is worse than a miss.
+function openings() {
+  const out = [];
+  for (const id of CONFIG.entities.doorSensors) {
+    const e = ent(id);
+    if (!e || e.state === 'unavailable' || e.state === 'unknown') continue;
+    out.push({ name: cleanName(e.attributes?.friendly_name || id), open: e.state === 'on' });
+  }
+  for (const id of CONFIG.entities.garageDoors) {
+    const e = ent(id);
+    if (!e || e.state === 'unavailable' || e.state === 'unknown') continue;
+    out.push({ name: cleanName(e.attributes?.friendly_name || id), open: e.state !== 'closed' });
+  }
+  return out;
+}
+
+function closure() {
+  const all = openings();
+  if (!all.length) return null;
+  const open = all.filter(o => o.open);
+  if (!open.length) return { text: L.allClosed(), open: false, names: null };
+  const names = listJoin(open.map(o => o.name));
+  return { text: L.openList(names), open: true, names };
+}
+
+function commute() {
+  const e = ent(CONFIG.entities.commuteSensor);
+  const min = numeric(e?.state);
+  if (min === null) return null;
+  // Only when it is actually a commute: a workday, and someone home to leave.
+  const wd = CONFIG.entities.workdaySensor;
+  if (wd && ent(wd)?.state !== 'on') return null;
+  const who = CONFIG.entities.commutePresence;
+  if (who && ent(who)?.state !== 'home') return null;
+  // Whatever icon the entity carries in HA travels with it, so the place a
+  // sensor points at is labelled the way its owner already labelled it.
+  const icon = String(e.attributes?.icon || '').replace(/^mdi:/, '') || null;
+  return {
+    text: L.commuteTo(Math.round(min), cleanName(e.attributes?.friendly_name || '')),
+    route: e.attributes?.route || null,
+    icon,
+  };
+}
+
+function bird() {
+  const e = ent(CONFIG.entities.birdnetSensor);
+  if (!e) return null;
+  const a = e.attributes || {};
+  const when = new Date(e.state);
+  if (!Number.isFinite(when.getTime()) || !a.CommonName) return null;
+  // Yesterday's bird is not news; stop showing it once it goes stale.
+  const ageH = (Date.now() - when.getTime()) / 3600000;
+  if (ageH > CONFIG.birdMaxAgeHours || ageH < -1) return null;
+  // Confidence arrives as a 0–1 fraction on the attribute, a percent elsewhere.
+  const conf = numeric(a.Confidence);
+  const mer = HOUR12 ? (zonedParts(when).h >= 12 ? ' PM' : ' AM') : '';
+  return {
+    name: a.CommonName,
+    sci: a.ScientificName || null,
+    when: fmtClock(when) + mer,
+    source: a.sourceName ? cleanName(a.sourceName) : null,
+    image: a.BirdImage?.URL || null,
+    confidence: conf === null ? null : Math.round(conf <= 1 ? conf * 100 : conf),
+  };
 }
 
 function buildViewmodel() {
@@ -822,6 +994,7 @@ function buildViewmodel() {
   const waterUnit = ent(CONFIG.entities.waterToday)?.attributes?.unit_of_measurement || 'gal';
 
   const firstUpTomorrow = timedEvents(S.calTomorrow)[0];
+  const birdCard = bird();
   const tomorrowName = new Intl.DateTimeFormat(LOCALE, { timeZone: TZ, weekday: 'long' })
     .format(addDays(new Date(), 1)).toUpperCase();
 
@@ -833,7 +1006,8 @@ function buildViewmodel() {
     hour12: HOUR12,
     strings: CLIENT_STRINGS,
     dayparts: CONFIG.dayparts,
-    alert: alertBand(),
+    alerts: alerts(),
+    maxAlerts: CONFIG.maxAlerts,
     rail: {
       sunrise: sunTimes.sunrise || null,
       sunset: sunTimes.sunset || null,
@@ -860,11 +1034,14 @@ function buildViewmodel() {
         hours: S.powerHours,
       },
       bins: binsLine(),
+      commute: commute(),
+      bird: birdCard,
     },
     evening: {
       tomorrowName,
       agenda: agendaTomorrow(),
       prep: eveningPrep(),
+      bird: birdCard,
       overnight: overnight(),
       tomorrow: tomorrowCard(),
       power: { total: powerTotal, unit: powerUnit, hours: S.powerHours },
@@ -875,6 +1052,8 @@ function buildViewmodel() {
       tempIn: indoorTemp !== null ? Math.round(indoorTemp) : null,
       tempOut: outdoorTemp !== null ? Math.round(outdoorTemp) : null,
       condition: nightCondition(),
+      closure: closure(),
+      bird: birdCard,
       firstUp: firstUpTomorrow
         ? `${L.firstUp} ${fmtClock(firstUpTomorrow.start)} · ${firstUpTomorrow.summary.toUpperCase()}`
         : null,

@@ -17,7 +17,23 @@
     "leakSensors": [
       "binary_sensor.smart_water_leak_sensor_150010200809_waterleak",
       "binary_sensor.water_meter_10550481_leak_sensor_2"
-    ]
+    ],
+    "coSensors": [
+      "sensor.emmie_air_quality_carbon_monoxide_2"
+    ],
+    "radonSensor": "sensor.airthings_wave2_025444_radon_1_day_average",
+    "doorSensors": [
+      "binary_sensor.0x00158d008bbc7657_contact",
+      "binary_sensor.0x00158d008bbd4dc2_contact",
+      "binary_sensor.0x00158d008bbc729b_contact"
+    ],
+    "garageDoors": [
+      "cover.smart_garage_door_2305169042103561070348e1e9c6c3ce_garage"
+    ],
+    "birdnetSensor": "sensor.birdnet_go",
+    "commuteSensor": "sensor.work",
+    "workdaySensor": "binary_sensor.workday_sensor",
+    "commutePresence": "person.steven"
   },
   "dayparts": {
     "morningStart": "05:30",
@@ -28,6 +44,10 @@
   },
   "prepBufferMin": 15,
   "aqiAlertThreshold": 125,
+  "coAlertPpm": 9,
+  "radonAlertPciL": 4,
+  "maxAlerts": 3,
+  "birdMaxAgeHours": 12,
   "rainProbThreshold": 40,
   "gasThermsPerFt3": 0.01037,
   "language": null,

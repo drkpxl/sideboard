@@ -96,10 +96,88 @@ body { font-family: 'Work Sans', sans-serif; }
   font-size: 61px;
   font-weight: 400;
   line-height: 1.1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.alert-row {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Each extra stacked alert costs the screen below it real estate, so the band
+   trades type size for rows rather than growing without limit. */
+.alert-band.rows-2 { font-size: 48px; padding: 22px 65px; gap: 10px; }
+.alert-band.rows-3 { font-size: 40px; padding: 18px 65px; gap: 8px; }
+.alert-band.rows-4 { font-size: 34px; padding: 16px 65px; gap: 6px; }
+.alert-row.more { opacity: .72; font-size: .8em; }
+
+/* Morning is the dense screen: every extra band row has to be paid for below
+   it, or the stat tiles clip. Shrinking the countdown clock frees the most
+   height for the least legibility cost, so it takes the biggest cut. */
+.screen.compact-2 .m-body { padding: 30px 65px; gap: 24px 57px; }
+.screen.compact-2 .m-countdown .clock { font-size: 186px; }
+.screen.compact-2 .m-advice .text { font-size: 46px; }
+.screen.compact-2 .tile .v { font-size: 52px; }
+.screen.compact-2 .m-commute { font-size: 28px; }
+
+.screen.compact-3 .m-body { padding: 22px 65px; gap: 18px 57px; }
+.screen.compact-3 .m-countdown .clock { font-size: 150px; }
+.screen.compact-3 .m-advice .text { font-size: 40px; }
+.screen.compact-3 .tile { padding: 22px 28px; gap: 8px; }
+.screen.compact-3 .tile .v { font-size: 46px; }
+.screen.compact-3 .m-commute { font-size: 26px; }
+/* Three live alerts outrank the bird and the bins line. */
+.screen.compact-3 .m-footer { display: none; }
+
+.screen.compact-4 .m-body { padding: 16px 65px; gap: 14px 57px; }
+.screen.compact-4 .m-countdown .clock { font-size: 124px; }
+.screen.compact-4 .m-advice .text { font-size: 35px; }
+.screen.compact-4 .tile { padding: 16px 24px; gap: 6px; }
+.screen.compact-4 .tile .v { font-size: 40px; }
+.screen.compact-4 .m-commute { font-size: 24px; }
+.screen.compact-4 .m-footer { display: none; }
+
+/* Evening carries two cards plus two charts in its right column, so it needs
+   the same treatment — it had none before, and overflowed even a one-row band. */
+.screen.compact .e-body { padding: 40px 65px; gap: 44px; }
+.screen.compact .e-left .rows { margin-top: 32px; gap: 22px; }
+.screen.compact .e-left .agenda-row .t { font-size: 52px; }
+.screen.compact .e-left .agenda-row .n { font-size: 55px; }
+.screen.compact .e-prep { font-size: 48px; padding: 27px 33px; }
+.screen.compact .e-card { padding: 27px 36px; gap: 12px; }
+.screen.compact .e-card .big { font-size: 66px; }
+.screen.compact .e-right { gap: 22px; }
+.screen.compact .e-usage { padding: 27px 36px; gap: 22px; }
+.screen.compact .e-usage .bars { height: 46px; }
+
+.screen.compact-2 .e-body { padding: 30px 65px; gap: 40px; }
+.screen.compact-2 .e-left .rows { margin-top: 24px; gap: 18px; }
+.screen.compact-2 .e-prep { font-size: 42px; padding: 23px 30px; }
+.screen.compact-2 .e-card .big { font-size: 58px; }
+.screen.compact-2 .e-usage .bars { height: 40px; }
+
+.screen.compact-3 .e-body { padding: 22px 65px; gap: 36px; }
+.screen.compact-3 .e-left .rows { margin-top: 18px; gap: 14px; }
+.screen.compact-3 .e-left .agenda-row .t { font-size: 44px; }
+.screen.compact-3 .e-left .agenda-row .n { font-size: 46px; }
+.screen.compact-3 .e-prep { font-size: 36px; padding: 20px 26px; }
+.screen.compact-3 .e-card { padding: 20px 28px; gap: 8px; }
+.screen.compact-3 .e-card .big { font-size: 50px; }
+.screen.compact-3 .e-right { gap: 16px; }
+.screen.compact-3 .e-usage { padding: 20px 28px; gap: 16px; }
+.screen.compact-3 .e-usage .bars { height: 34px; }
+
+.screen.compact-4 .e-body { padding: 16px 65px; gap: 32px; }
+.screen.compact-4 .e-left .rows { margin-top: 14px; gap: 11px; }
+.screen.compact-4 .e-left .agenda-row .t { font-size: 38px; }
+.screen.compact-4 .e-left .agenda-row .n { font-size: 40px; }
+.screen.compact-4 .e-prep { font-size: 31px; padding: 17px 22px; }
+.screen.compact-4 .e-card { padding: 16px 24px; gap: 6px; }
+.screen.compact-4 .e-card .big { font-size: 43px; }
+.screen.compact-4 .e-right { gap: 13px; }
+.screen.compact-4 .e-usage { padding: 16px 24px; gap: 13px; }
+.screen.compact-4 .e-usage .bars { height: 28px; }
 
 /* ------------------------------------------------ morning */
 
@@ -286,10 +364,18 @@ body { font-family: 'Work Sans', sans-serif; }
   padding: 0 65px 35px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
+  gap: 40px;
   font-size: 30px;
   color: var(--ink-mid);
 }
+.m-foot-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+}
+.m-foot-right { flex: none; }
 .m-footer .dot {
   width: 17px;
   height: 17px;
@@ -298,6 +384,52 @@ body { font-family: 'Work Sans', sans-serif; }
   flex: none;
 }
 .m-footer.empty { visibility: hidden; }
+
+/* ------------------------------------------------ commute + bird */
+
+.m-commute {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 30px;
+  color: var(--ink-mid);
+  min-width: 0;
+}
+.m-commute-text { min-width: 0; }
+.m-commute .route { color: var(--label); font-size: .82em; }
+
+/* Inline MDI glyphs inherit their colour from the text they sit beside. */
+.icon {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  fill: currentColor;
+}
+.m-commute .icon { color: var(--teak); width: 1.15em; height: 1.15em; }
+
+.bird { display: flex; align-items: center; gap: 20px; min-width: 0; }
+.bird-img {
+  flex: none;
+  object-fit: cover;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, .06);
+}
+.bird-text { min-width: 0; }
+.bird-label {
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--caption);
+}
+.bird-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bird-meta { color: var(--label); }
+
+/* Morning reads name-then-photo: words first, photo closing the line. */
+.bird.small .bird-text { text-align: right; }
+.bird.small .bird-img { width: 74px; height: 74px; }
+.bird.small .bird-label { font-size: 19px; margin-bottom: 2px; }
+.bird.small .bird-name { font-size: 30px; color: var(--ink-mid); line-height: 1.1; }
+.bird.small .bird-meta { font-size: 21px; }
 
 /* ------------------------------------------------ evening */
 
@@ -322,12 +454,32 @@ body { font-family: 'Work Sans', sans-serif; }
   background: var(--olive);
   border-radius: var(--radius);
   padding: 33px 39px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  color: #FAF7F0;
+}
+.e-prep .sec-label { color: var(--olive-label); }
+.e-prep .prep-text {
   font-family: 'Jost', sans-serif;
   font-size: 57px;
   line-height: 1.28;
-  color: #FAF7F0;
   white-space: pre-line;
 }
+/* On a night with nothing to do, the box carries the bird instead of an
+   empty heading or a restatement of the agenda printed right above it. */
+.e-prep.bird-card { padding: 28px 33px; }
+.bird.evening { gap: 26px; }
+/* Photo leads here, unlike the morning strip where it closes the line. */
+.bird.evening .bird-img { order: -1; width: 128px; height: 128px; border-radius: 6px; }
+.bird.evening .bird-label { font-size: 24px; color: var(--olive-label); }
+.bird.evening .bird-name {
+  font-family: 'Jost', sans-serif;
+  font-size: 50px;
+  line-height: 1.15;
+  color: #FAF7F0;
+}
+.bird.evening .bird-meta { font-size: 26px; color: var(--olive-label); }
 .e-right {
   flex: 1;
   display: flex;
@@ -360,23 +512,8 @@ body { font-family: 'Work Sans', sans-serif; }
 .e-usage .total small { font-size: 28px; color: var(--label); font-weight: 400; margin-left: 6px; }
 .e-usage .bars { height: 57px; }
 
-.e-footer {
-  flex: none;
-  background: var(--walnut);
-  color: var(--walnut-text-dim);
-  padding: 24px 65px;
-  display: flex;
-  align-items: baseline;
-  gap: 96px;
-}
-.e-footer .lbl {
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  opacity: .6;
-}
-.e-footer .val { font-family: 'Jost', sans-serif; font-size: 30px; }
+/* Gas has no hourly history to chart, so it rides along as a bare total. */
+.e-usage .chart.gas { gap: 0; }
 
 /* ------------------------------------------------ night */
 
@@ -422,7 +559,46 @@ body { font-family: 'Work Sans', sans-serif; }
   text-transform: uppercase;
   color: var(--night-tertiary);
 }
+.n-closure {
+  margin-top: 34px;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--night-label);
+}
+/* An open door at night is the one thing on this screen worth a warm colour. */
+.n-closure.open { color: var(--night-warm); }
+
+.bird.night {
+  margin-top: 40px;
+  flex-direction: column;
+  gap: 14px;
+  text-align: center;
+}
+.bird.night .bird-label { font-size: 24px; color: var(--night-label); }
+.bird.night .bird-img {
+  width: 260px;
+  height: 260px;
+  border-radius: 10px;
+  opacity: .78;
+}
+.bird.night .bird-name {
+  font-family: 'Jost', sans-serif;
+  font-size: 38px;
+  color: var(--night-clock);
+}
+.bird.night .bird-meta {
+  font-size: 24px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--night-tertiary);
+}
+
 .screen.night .alert-band { font-size: 52px; }
+.screen.night .alert-band.rows-2 { font-size: 42px; }
+.screen.night .alert-band.rows-3 { font-size: 36px; }
+.screen.night .alert-band.rows-4 { font-size: 31px; }
 
 /* offline hint — tiny, unobtrusive */
 .stale {
